@@ -3,10 +3,12 @@
 module NLP.TextClustering where
 
 import NLP.TextClustering.DistanceUtils
-import Math.HKMeans.KMeans
-import Numeric.LinearAlgebra
+import Math.HKMeans.KMeans (kmeans)
+import Numeric.LinearAlgebra (Vector, fromList)
 import Data.Char (toLower)
-import NLP.Tokenize
+import NLP.Tokenize (tokenize)
+import Data.Ord (comparing)
+import Data.List (sortBy)
 
 
 -- Option of the clusterization
@@ -42,7 +44,7 @@ lemmatize :: [(Tag, Word)] -> [Word]
 lemmatize = snd . unzip
 
 
--- Statistics of documents
+-- Build the feature vectors representing the texts
 buildFeatureVectors :: [[Word]] -> [Vector Double]
 buildFeatureVectors _ = [fromList [1..42]]
 
@@ -52,24 +54,22 @@ clusterize :: Algorithm -> Distance -> [Vector Double] -> [Int]
 clusterize algorithm distance =
     case algorithm of
         (KMeans k) -> kmeans d k
-        _ -> error "No such clusterization algorithm"
     where
         -- Select the distance to use
         d = case distance of
                 Euclidean -> euclideanDistance
                 Cosine -> cosineDistance
                 (Custom _distance) -> _distance
-                _ -> error "No Such distance"
 
 
-clusterDocuments :: Algorithm -> Distance -> [Document] -> [(Int, Name)]
+clusterDocuments :: Algorithm -> Distance -> [Document] -> [(Name, Int)]
 clusterDocuments algorithm distance documents =
-    let (names, texts) = unzip documents -- Separate names of their respective text
+    let (names, texts) = unzip documents -- Separate names from their respective text
         preprocessing = map $       -- Apply preprocessing on texts
-              lemmatize             -- Lematize each word to a canonical form
+              lemmatize             -- Lemmatize each word to a canonical form
             . filterWords           -- Filter useless and common words
             . partOfSpeechTagging   -- Find part of speech tag for each word
             . tokenize              -- Tokenize the document
             . map toLower           -- Lower every letters in the document
         datas = buildFeatureVectors $ preprocessing texts -- Build feature space
-    in zip (clusterize algorithm distance datas) names
+    in sortBy (comparing snd) $ zip names $ clusterize algorithm distance datas
