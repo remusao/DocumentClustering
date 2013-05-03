@@ -1,0 +1,22 @@
+name:                text-clustering
+version:             0.1
+synopsis:            Library performing a text clustering given a corpus of texts
+description:            Library performing a text clustering given a corpus of texts
+license:             GPL-2
+license-file:        LICENSE
+author:              Rémi Berson
+maintainer:          remi.berson@gmail.com
+category:            NLP
+build-type:          Simple
+cabal-version:       >=1.8
+
+library
+  exposed-modules:  NLP.TextClustering
+  build-depends:    base, tokenize
+  ghc-options:      -Wall -O2
+
+Executable ClusteringCheck
+    Build-Depends:  base, text-clustering
+    hs-source-dirs: Test
+    Main-is:        ClusteringCheck.hs
+    ghc-options:    -Wall -O2
