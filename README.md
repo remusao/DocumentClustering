@@ -6,7 +6,9 @@ This package will provide functions to cluster documents.
 Dependencies
 ------------
 
-None
+* tokenize
+* hmatrix
+* HKMeans
 
 Installation
 ------------
