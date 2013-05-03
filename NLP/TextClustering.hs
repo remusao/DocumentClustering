@@ -43,19 +43,17 @@ lemmatize = snd . unzip
 
 
 -- Statistics of documents
-documentStatistics :: [Word] -> Vector Double
-documentStatistics _ = fromList [1..42]
+buildFeatureVectors :: [[Word]] -> [Vector Double]
+buildFeatureVectors _ = [fromList [1..42]]
 
 
 -- Clusterize
 clusterize :: Algorithm -> Distance -> [Vector Double] -> [Int]
-clusterize algorithm distance = cluster
+clusterize algorithm distance =
+    case algorithm of
+        (KMeans k) -> kmeans d k
+        _ -> error "No such clusterization algorithm"
     where
-        -- Select the good clustering algorithm
-        cluster =
-            case algorithm of
-                (KMeans k) -> kmeans d k
-                _ -> error "No such clusterization algorithm"
         -- Select the distance to use
         d = case distance of
                 Euclidean -> euclideanDistance
@@ -66,12 +64,12 @@ clusterize algorithm distance = cluster
 
 clusterDocuments :: Algorithm -> Distance -> [Document] -> [(Int, Name)]
 clusterDocuments algorithm distance documents =
-    let (names, texts) = unzip documents
-        preprocessing = map $
-            documentStatistics      -- Count words to build a vector for the document
-            . lemmatize             -- Lematize each word to a canonical form
+    let (names, texts) = unzip documents -- Separate names of their respective text
+        preprocessing = map $       -- Apply preprocessing on texts
+              lemmatize             -- Lematize each word to a canonical form
             . filterWords           -- Filter useless and common words
             . partOfSpeechTagging   -- Find part of speech tag for each word
             . tokenize              -- Tokenize the document
             . map toLower           -- Lower every letters in the document
-    in zip (clusterize algorithm distance (preprocessing texts)) names
+        datas = buildFeatureVectors $ preprocessing texts -- Build feature space
+    in zip (clusterize algorithm distance datas) names
