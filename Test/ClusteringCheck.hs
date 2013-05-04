@@ -13,4 +13,5 @@ main =
             _ ->
                 do
                     documents <- mapM readFile args
-                    print $ clusterDocuments (KMeans 2) Euclidean $ zip args documents
+                    clustering <- clusterDocumentsVerbose (KMeans 4) Cosine $ zip args documents
+                    print clustering

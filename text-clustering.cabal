@@ -12,9 +12,8 @@ cabal-version:       >=1.8
 
 library
   exposed-modules:  NLP.TextClustering,
-                    NLP.TextClustering.DistanceUtils,
-                    NLP.TextClustering.FeatureSpace
-  build-depends:    base, tokenize, hmatrix, hkmeans, containers
+                    NLP.TextClustering.DistanceUtils
+  build-depends:    base, tokenize, hmatrix, hkmeans, containers, vector, idf
   ghc-options:      -Wall -O2
 
 Executable ClusteringCheck
