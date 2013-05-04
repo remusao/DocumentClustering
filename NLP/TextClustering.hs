@@ -1,10 +1,15 @@
 {-# LANGUAGE GADTs #-}
 
-module NLP.TextClustering where
+module NLP.TextClustering
+    (Algorithm(..),
+     Distance(..),
+     clusterDocuments)
+where
 
 import NLP.TextClustering.DistanceUtils
+import NLP.TextClustering.FeatureSpace
 import Math.HKMeans.KMeans (kmeans)
-import Numeric.LinearAlgebra (Vector, fromList)
+import Numeric.LinearAlgebra (Vector)
 import Data.Char (toLower)
 import NLP.Tokenize (tokenize)
 import Data.Ord (comparing)
@@ -25,7 +30,6 @@ type Text           = String
 type Name           = String
 type Word           = String
 type Document       = (Name, Text)
-type TaggedDocument = (Int, Name)
 
 
 -- Part Of Speech Tagging
@@ -36,17 +40,12 @@ partOfSpeechTagging = zip [1..] -- Just to make it compile
 
 -- Filter Useless Words
 filterWords :: [(Tag, Word)] -> [(Tag, Word)]
-filterWords = id
+filterWords = filter (\w -> (length . snd) w > 3)
 
 
 -- Lemmatize
 lemmatize :: [(Tag, Word)] -> [Word]
 lemmatize = snd . unzip
-
-
--- Build the feature vectors representing the texts
-buildFeatureVectors :: [[Word]] -> [Vector Double]
-buildFeatureVectors _ = [fromList [1..42]]
 
 
 -- Clusterize
@@ -60,6 +59,7 @@ clusterize algorithm distance =
                 Euclidean -> euclideanDistance
                 Cosine -> cosineDistance
                 (Custom _distance) -> _distance
+
 
 
 clusterDocuments :: Algorithm -> Distance -> [Document] -> [(Name, Int)]
