@@ -97,4 +97,5 @@ clusterDocumentsVerbose algorithm distance documents =
         putStrLn $ "Distance : " ++ (show distance)
         putStrLn $ "Clustering : " ++ (show algorithm)
         putStrLn $ "Dimension of feature space : " ++ (show $ dim $ head datas)
+        print $ datas
         return res
