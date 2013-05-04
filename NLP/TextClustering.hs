@@ -8,7 +8,7 @@ module NLP.TextClustering
      clusterDocumentsVerbose)
 where
 
-import Math.IDF
+import Math.IDF(buildFeatureVectors)
 import NLP.TextClustering.DistanceUtils
 import Math.HKMeans.KMeans (kmeans)
 import Numeric.LinearAlgebra (Vector, dim)
@@ -77,7 +77,7 @@ clusterDocuments algorithm distance documents =
             . partOfSpeechTagging   -- Find part of speech tag for each word
             . tokenize              -- Tokenize the document
             . map toLower           -- Lower every letters in the document
-        datas = idf $ preprocessing texts -- Build feature space
+        datas = buildFeatureVectors $ preprocessing texts -- Build feature space
     in sortBy (comparing snd) $ zip names $ clusterize algorithm distance datas
 
 
@@ -91,7 +91,7 @@ clusterDocumentsVerbose algorithm distance documents =
                 . partOfSpeechTagging   -- Find part of speech tag for each word
                 . tokenize              -- Tokenize the document
                 . map toLower           -- Lower every letters in the document
-            datas = idf $ preprocessing texts -- Build feature space
+            datas = buildFeatureVectors $ preprocessing texts -- Build feature space
             res = sortBy (comparing snd) $ zip names $ clusterize algorithm distance datas
         putStrLn $ "Debug trace of clustering"
         putStrLn $ "Distance : " ++ (show distance)
